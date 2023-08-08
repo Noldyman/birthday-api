@@ -91,9 +91,20 @@ namespace Birthday_Api.Controllers
             var today = DateTime.Today;
             var nextWeek = DateTime.Today.AddDays(7);
 
+            bool CheckIfThisWeek(DateTime birthday)
+            {
+                var birthdayThisYear = birthday.AddYears(today.Year - birthday.Year);
+                if(birthdayThisYear<today)
+                    {
+                    birthday.AddYears(1);
+                }
+
+                return birthdayThisYear >= today && birthdayThisYear <= nextWeek;
+            }
+
             using (var db = new BirthdayContext())
             {
-                var todaysBirthdays = db.Birthdays.Where(b => b.BirthDate.AddYears(today.Year - b.BirthDate.Year) >= today && b.BirthDate.AddYears(today.Year - b.BirthDate.Year) <= nextWeek).ToList();
+                var todaysBirthdays = db.Birthdays.ToList().Where(b => CheckIfThisWeek(b.BirthDate)).ToList();
                 return todaysBirthdays;
             }
         }
